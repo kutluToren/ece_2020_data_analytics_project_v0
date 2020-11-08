@@ -1,0 +1,773 @@
+---
+title: "Mini Project Instructions 1"
+author: "Kutlu Toren"
+output: html_notebook
+---
+HW for Instructions 1 in ECE Paris Data Analytics Class
+
+This Notebook is working over the outcome of the "data_preparation_script.R". 
+To make the document work please provide:
+
+- /data-20201106/data_cleansed
+    -/malaga
+      -/2020-06-30/listings.csv
+    -/mallorca
+      -/2020-09-19/listings.csv
+    -/sevilla
+      -/2020-06-29/listings.csv
+
+"ggplot2" is required for the following code
+
+## Combining all 3 tables for analysis 1
+```{r}
+
+cities_df <- rbind(
+  as.data.frame(read.csv("data-20201106/data_cleansed/malaga/2020-06-30/listings.csv")),
+  as.data.frame(read.csv("data-20201106/data_cleansed/mallorca/2020-09-19/listings.csv")),
+  as.data.frame(read.csv("data-20201106/data_cleansed/sevilla/2020-06-29/listings.csv")))
+
+head(cities_df)
+```
+## Adding ggplot 2 library for the Analysis 1
+
+```{r}
+library("ggplot2")
+```
+
+#Analysis 1
+
+## Analysis 1 - 1
+Showing the average value of availability with data points plotted with jitter()
+```{r}
+ggplot(cities_df,aes(x=city,y=availability_30, fill=city))+
+  geom_jitter(alpha = 0.1, shape = 16)+
+    theme(legend.position="none")+
+  ggtitle("Availability over Cities (Average value in red)")+
+  xlab("Name of the Cities")+ylab("Availability over 30 Days")+
+  stat_summary(fun=mean, geom="pointrange",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes(      label=round(..y.., digits=4)))
+
+```
+
+## Analysis 1 - 2
+Showing the average value of estimated revenue with data points plotted with jitter()
+```{r}
+ggplot(subset(cities_df,revenue_30<3000,c(city,revenue_30)),
+       aes(x=city,y=revenue_30, fill=city))+
+  geom_jitter(alpha = 0.1, shape = 16)+
+  theme(legend.position="none")+
+  ggtitle("Revenue over Cities (Average value in red)")+
+  xlab("Name of the Cities")+ylab("Revenue over 30 Days")+
+  stat_summary(fun=mean, geom="pointrange",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes(      label=round(..y.., digits=4)))
+```
+
+
+## Analysis 1 - 3
+boxplot of Availability in 30 days with respect to the cities average value showed in red crossbar
+```{r}
+
+ggplot(cities_df,aes(x=city,y=availability_30, fill=city))+geom_boxplot() +
+
+  ggtitle("Availability over Cities (Average value in red)")+
+  xlab("Name of the Cities")+ylab("Availability over 30 Days")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes( label=round(..y.., digits=4)))+
+  scale_fill_brewer(palette="BuPu")
+
+```
+## Analysis 1-4
+boxplot of Revenues in 30 days with respect to the cities average value showed in red crossbar
+```{r}
+ggplot(subset(cities_df,revenue_30<3000,c(city,revenue_30)),
+       aes(x=city,y=revenue_30, fill=city))+geom_boxplot() +
+
+  ggtitle("Revenue over Cities (Average value in red)")+
+  xlab("Name of the Cities")+ylab("Revenue over 30 Days")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes( label=round(..y.., digits=4)))+
+  scale_fill_brewer(palette="BuPu")
+```
+
+## Analysis 1-5
+Plot of Estimated revenue over 30 days with respect to number of Rooms for each city. Room number higher than 10 and Revenue higher than 3000 are not considered for a better visual
+```{r}
+
+ggplot(subset(cities_df,bedrooms<=10&revenue_30<3000,c(city,revenue_30,bedrooms)), 
+       aes(x=bedrooms , y=revenue_30 , fill=as.factor(bedrooms)))+ 
+  geom_bar(stat="identity")+facet_grid(.~city)+
+  ggtitle("Revenue estimation over # of Rooms for 3 cities")+
+  xlab("# of Rooms")+ylab("Revenue over 30 Days")+ labs(fill="# of Rooms")
+```
+
+## Analysis 1-6
+Plot of "Estimated revenue over 30 days" with respect to "Room Types" for each city. Revenue higher than 3000 are not considered for a better visual
+```{r}
+ggplot(subset(cities_df,revenue_30<3000,c(city,revenue_30,room_type)), 
+       aes(x=room_type , y=revenue_30 , fill=as.factor(room_type)))+ 
+  geom_bar(stat="identity")+facet_grid(.~city)+
+  ggtitle("Revenue estimation over # of Rooms for 3 cities")+
+  xlab("Room Type")+ylab("Revenue over 30 Days")+ labs(fill="Room Type")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+
+
+###############################################################3
+
+
+# Analysis 2
+The results of analysis 2 will be 3 chapters each contain same graphs for 3 different cities. Codes will be identical with the changing city name 
+
+## Analysis 2 for the city Malaga
+### Analysis 2.1
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected,room_type))+
+geom_bar(mapping = aes(x=room_type,fill=as.factor(room_type)))+
+  ggtitle( paste("Distribution of room types for",city_sellected))+
+  xlab("Room Type")+ labs(fill="Room Type")
+```
+### Analysis 2.2
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected & bedrooms <= 10 ,bedrooms))+
+geom_bar(mapping = aes(x=bedrooms,fill=as.factor(bedrooms)))+
+  ggtitle( paste("Distribution of # of roomsfor",city_sellected))+
+  xlab("# of Room")+ labs(fill="# of Room")
+```
+### Analysis 2.3
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected,neighbourhood_cleansed))+
+geom_bar(mapping = aes(x=neighbourhood_cleansed,fill=as.factor(neighbourhood_cleansed)))+
+  ggtitle( paste("Distribution of neighborhood for",city_sellected))+
+  xlab("Name of Neighborhood")+ labs(fill="Name of Neighborhood")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.4
+Availability 
+### Analysis 2.4.1
+Analysis for room type
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected,c(room_type,availability_30)), 
+       aes(x=room_type , y=availability_30 , fill=as.factor(room_type)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over # of Rooms for ",city_sellected))+
+  xlab("Room Type")+ylab("Availability over 30 Days")+ labs(fill="Room Type")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.4.2
+Analysis for house size
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected & bedrooms<=10,c(bedrooms,availability_30)), 
+       aes(x=bedrooms , y=availability_30 , fill=as.factor(bedrooms)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over House Size for ",city_sellected))+
+  xlab("House Size")+ylab("Availability over 30 Days")+ labs(fill="House Size")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.4.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected ,c(neighbourhood_cleansed,availability_30)), 
+       aes(x=neighbourhood_cleansed , y=availability_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Availability over 30 Days")+ labs(fill="Neighborhood")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+
+
+### Analysis 2.5
+Revenue 
+### Analysis 2.5.1
+Analysis for room type
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected&revenue_30<3000,c(room_type,revenue_30)), 
+       aes(x=room_type , y=revenue_30 , fill=as.factor(room_type)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over # of Rooms for ",city_sellected))+
+  xlab("Room Type")+ylab("Revenue over 30 Days")+ labs(fill="Room Type")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+
+### Analysis 2.5.2
+Analysis for house size
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected & bedrooms<=10&revenue_30<3000,
+              c(bedrooms,revenue_30)), 
+       aes(x=bedrooms , y=revenue_30 , fill=as.factor(bedrooms)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over House Size for ",city_sellected))+
+  xlab("House Size")+ylab("Revenue over 30 Days")+ labs(fill="House Size")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.5.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected & revenue_30<3000,
+              c(neighbourhood_cleansed,revenue_30)), 
+       aes(x=neighbourhood_cleansed , y=revenue_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Revenue over 30 Days")+ labs(fill="Neighborhood")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.6
+Distribution of Availability
+### Analysis 2.6.1
+Analysis for room type
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected,c(room_type,availability_30)), 
+       aes(x=room_type , y=availability_30 , fill=as.factor(room_type)))+ 
+  geom_boxplot()+
+  ggtitle(paste("Availability over Room Types ",city_sellected))+
+  xlab("Room Type")+ylab("Availability over 30 Days")+ labs(fill="Room Type")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes( label=round(..y.., digits=4)))+
+  scale_fill_brewer(palette="BuPu")
+```
+### Analysis 2.6.2
+Analysis for house size
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected&bedrooms<=10,c(availability_30,bedrooms)), 
+       aes(x=bedrooms , y=availability_30 , fill=as.factor(bedrooms)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("Availability over # of Rooms for ",city_sellected))+
+  xlab("# of Rooms")+ylab("Availability over 30 Days")+ labs(fill="# of Rooms")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))
+```
+### Analysis 2.6.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected,c(availability_30,neighbourhood_cleansed)), 
+       aes(x=neighbourhood_cleansed , y=availability_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("Availability over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Availability over 30 Days")+ labs(fill="Neighborhood")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))
+```
+### Analysis 2.7
+Distribution of Revenue
+### Analysis 2.7.1
+Analysis for room type
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected & revenue_30<3000,c(room_type,revenue_30)), 
+       aes(x=room_type , y=revenue_30 , fill=as.factor(room_type)))+ 
+  geom_boxplot()+
+  ggtitle(paste("Revenue over Room Types ",city_sellected))+
+  xlab("Room Type")+ylab("Revenue over 30 Days")+ labs(fill="Room Type")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes( label=round(..y.., digits=4)))+
+  scale_fill_brewer(palette="BuPu")
+
+```
+### Analysis 2.7.2
+Analysis for house size
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected&bedrooms<=10&revenue_30<3000,
+              c(revenue_30,bedrooms)), 
+       aes(x=bedrooms , y=revenue_30 , fill=as.factor(bedrooms)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("revenue over # of Rooms for ",city_sellected))+
+  xlab("# of Rooms")+ylab("revenue over 30 Days")+ labs(fill="# of Rooms")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))
+```
+### Analysis 2.7.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "malaga"
+
+ggplot(subset(cities_df,city==city_sellected&revenue_30<3000,
+              c(revenue_30,neighbourhood_cleansed)), 
+       aes(x=neighbourhood_cleansed , y=revenue_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("revenue over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("revenue over 30 Days")+ labs(fill="Neighborhood")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))
+```
+
+
+###############################################################################################
+
+
+## Analysis 2 for the city Mallorca
+### Analysis 2.1
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected,room_type))+
+geom_bar(mapping = aes(x=room_type,fill=as.factor(room_type)))+
+  ggtitle( paste("Distribution of room types for",city_sellected))+
+  xlab("Room Type")+ labs(fill="Room Type")
+
+
+```
+### Analysis 2.2
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected & bedrooms <= 10 ,bedrooms))+
+geom_bar(mapping = aes(x=bedrooms,fill=as.factor(bedrooms)))+
+  ggtitle( paste("Distribution of # of roomsfor",city_sellected))+
+  xlab("# of Room")+ labs(fill="# of Room")
+```
+
+### Analysis 2.3
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected,neighbourhood_cleansed))+
+geom_bar(mapping = aes(x=neighbourhood_cleansed,fill=as.factor(neighbourhood_cleansed)))+
+  ggtitle( paste("Distribution of neighborhood for",city_sellected))+
+  xlab("Name of Neighborhood")+ labs(fill="Name of Neighborhood")+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+### Analysis 2.4
+Availability 
+### Analysis 2.4.1
+Analysis for room type
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected,c(room_type,availability_30)), 
+       aes(x=room_type , y=availability_30 , fill=as.factor(room_type)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over # of Rooms for ",city_sellected))+
+  xlab("Room Type")+ylab("Availability over 30 Days")+ labs(fill="Room Type")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.4.2
+Analysis for house size
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected & bedrooms<=10,c(bedrooms,availability_30)), 
+       aes(x=bedrooms , y=availability_30 , fill=as.factor(bedrooms)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over House Size for ",city_sellected))+
+  xlab("House Size")+ylab("Availability over 30 Days")+ labs(fill="House Size")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.4.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected ,c(neighbourhood_cleansed,availability_30)), 
+       aes(x=neighbourhood_cleansed , y=availability_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Availability over 30 Days")+ labs(fill="Neighborhood")+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+### Analysis 2.5
+Revenue 
+### Analysis 2.5.1
+Analysis for room type
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected&revenue_30<3000,c(room_type,revenue_30)), 
+       aes(x=room_type , y=revenue_30 , fill=as.factor(room_type)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over # of Rooms for ",city_sellected))+
+  xlab("Room Type")+ylab("Revenue over 30 Days")+ labs(fill="Room Type")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.5.2
+Analysis for house size
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected & bedrooms<=10&revenue_30<3000,
+              c(bedrooms,revenue_30)), 
+       aes(x=bedrooms , y=revenue_30 , fill=as.factor(bedrooms)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over House Size for ",city_sellected))+
+  xlab("House Size")+ylab("Revenue over 30 Days")+ labs(fill="House Size")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.5.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected & revenue_30<3000,
+              c(neighbourhood_cleansed,revenue_30)), 
+       aes(x=neighbourhood_cleansed , y=revenue_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Revenue over 30 Days")+ labs(fill="Neighborhood")+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+### Analysis 2.6
+Distribution of Availability
+### Analysis 2.6.1
+Analysis for room type
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected,c(room_type,availability_30)), 
+       aes(x=room_type , y=availability_30 , fill=as.factor(room_type)))+ 
+  geom_boxplot()+
+  ggtitle(paste("Availability over Room Types ",city_sellected))+
+  xlab("Room Type")+ylab("Availability over 30 Days")+ labs(fill="Room Type")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes( label=round(..y.., digits=4)))+
+  scale_fill_brewer(palette="BuPu")
+
+```
+### Analysis 2.6.2
+Analysis for house size
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected&bedrooms<=10,c(availability_30,bedrooms)), 
+       aes(x=bedrooms , y=availability_30 , fill=as.factor(bedrooms)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("Availability over # of Rooms for ",city_sellected))+
+  xlab("# of Rooms")+ylab("Availability over 30 Days")+ labs(fill="# of Rooms")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))
+```
+### Analysis 2.6.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected,c(availability_30,neighbourhood_cleansed)), 
+       aes(x=neighbourhood_cleansed , y=availability_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("Availability over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Availability over 30 Days")+ labs(fill="Neighborhood")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=2)))+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+### Analysis 2.7
+Distribution of Revenue
+### Analysis 2.7.1
+Analysis for room type
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected & revenue_30<3000,c(room_type,revenue_30)), 
+       aes(x=room_type , y=revenue_30 , fill=as.factor(room_type)))+ 
+  geom_boxplot()+
+  ggtitle(paste("Revenue over Room Types ",city_sellected))+
+  xlab("Room Type")+ylab("Revenue over 30 Days")+ labs(fill="Room Type")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes( label=round(..y.., digits=4)))+
+  scale_fill_brewer(palette="BuPu")
+```
+### Analysis 2.7.2
+Analysis for house size
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected&bedrooms<=10&revenue_30<3000,
+              c(revenue_30,bedrooms)), 
+       aes(x=bedrooms , y=revenue_30 , fill=as.factor(bedrooms)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("revenue over # of Rooms for ",city_sellected))+
+  xlab("# of Rooms")+ylab("revenue over 30 Days")+ labs(fill="# of Rooms")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))
+```
+### Analysis 2.7.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "mallorca"
+
+ggplot(subset(cities_df,city==city_sellected&revenue_30<3000,
+              c(revenue_30,neighbourhood_cleansed)), 
+       aes(x=neighbourhood_cleansed , y=revenue_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("revenue over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("revenue over 30 Days")+ labs(fill="Neighborhood")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+
+
+###############################################################################################
+
+
+## Analysis 2 for the city Sevilla
+### Analysis 2.1
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected,room_type))+
+geom_bar(mapping = aes(x=room_type,fill=as.factor(room_type)))+
+  ggtitle( paste("Distribution of room types for",city_sellected))+
+  xlab("Room Type")+ labs(fill="Room Type")
+```
+### Analysis 2.2
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected& bedrooms <= 10 ,bedrooms))+
+geom_bar(mapping = aes(x=bedrooms,fill=as.factor(bedrooms)))+
+  ggtitle( paste("Distribution of # of roomsfor",city_sellected))+
+  xlab("# of Room")+ labs(fill="# of Room")
+```
+
+### Analysis 2.3
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected,neighbourhood_cleansed))+
+geom_bar(mapping = aes(x=neighbourhood_cleansed,fill=as.factor(neighbourhood_cleansed)))+
+  ggtitle( paste("Distribution of neighborhood for",city_sellected))+
+  xlab("Name of Neighborhood")+ labs(fill="Name of Neighborhood")+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+### Analysis 2.4
+Availability
+
+### Analysis 2.4.1
+Analysis for room type
+
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected,c(room_type,availability_30)), 
+       aes(x=room_type , y=availability_30 , fill=as.factor(room_type)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over # of Rooms for ",city_sellected))+
+  xlab("Room Type")+ylab("Availability over 30 Days")+ labs(fill="Room Type")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.4.2
+Analysis for house size
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected & bedrooms<=10,c(bedrooms,availability_30)), 
+       aes(x=bedrooms , y=availability_30 , fill=as.factor(bedrooms)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over House Size for ",city_sellected))+
+  xlab("House Size")+ylab("Availability over 30 Days")+ labs(fill="House Size")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.4.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected ,c(neighbourhood_cleansed,availability_30)), 
+       aes(x=neighbourhood_cleansed , y=availability_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Availability over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Availability over 30 Days")+ labs(fill="Neighborhood")+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+### Analysis 2.5
+Revenue
+### Analysis 2.5.1
+Analysis for room type
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected&revenue_30<3000,c(room_type,revenue_30)), 
+       aes(x=room_type , y=revenue_30 , fill=as.factor(room_type)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over # of Rooms for ",city_sellected))+
+  xlab("Room Type")+ylab("Revenue over 30 Days")+ labs(fill="Room Type")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+
+```
+### Analysis 2.5.2
+Analysis for house size
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected & bedrooms<=10&revenue_30<3000,
+              c(bedrooms,revenue_30)), 
+       aes(x=bedrooms , y=revenue_30 , fill=as.factor(bedrooms)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over House Size for ",city_sellected))+
+  xlab("House Size")+ylab("Revenue over 30 Days")+ labs(fill="House Size")+
+  theme(axis.text.x=element_text(angle = -90, hjust =1,size = 7))
+```
+### Analysis 2.5.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected & revenue_30<3000,
+              c(neighbourhood_cleansed,revenue_30)), 
+       aes(x=neighbourhood_cleansed , y=revenue_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_bar(stat="identity")+
+  ggtitle(paste("Revenue over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Revenue over 30 Days")+ labs(fill="Neighborhood")+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+### Analysis 2.6
+Distribution of Availability
+### Analysis 2.6.1
+Analysis for room type
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected,c(room_type,availability_30)), 
+       aes(x=room_type , y=availability_30 , fill=as.factor(room_type)))+ 
+  geom_boxplot()+
+  ggtitle(paste("Availability over Room Types ",city_sellected))+
+  xlab("Room Type")+ylab("Availability over 30 Days")+ labs(fill="Room Type")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes( label=round(..y.., digits=4)))+
+  scale_fill_brewer(palette="BuPu")
+```
+### Analysis 2.6.2
+Analysis for house size
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected&bedrooms<=10,c(availability_30,bedrooms)), 
+       aes(x=bedrooms , y=availability_30 , fill=as.factor(bedrooms)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("Availability over # of Rooms for ",city_sellected))+
+  xlab("# of Rooms")+ylab("Availability over 30 Days")+ labs(fill="# of Rooms")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))
+```
+### Analysis 2.6.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected,c(availability_30,neighbourhood_cleansed)), 
+       aes(x=neighbourhood_cleansed , y=availability_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("Availability over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("Availability over 30 Days")+ labs(fill="Neighborhood")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=2)))+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+### Analysis 2.7
+Distribution of Revenue
+### Analysis 2.7.1
+Analysis for room type
+
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected & revenue_30<3000,c(room_type,revenue_30)), 
+       aes(x=room_type , y=revenue_30 , fill=as.factor(room_type)))+ 
+  geom_boxplot()+
+  ggtitle(paste("Revenue over Room Types ",city_sellected))+
+  xlab("Room Type")+ylab("Revenue over 30 Days")+ labs(fill="Room Type")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      aes( label=round(..y.., digits=4)))+
+  scale_fill_brewer(palette="BuPu")
+```
+### Analysis 2.7.2
+Analysis for house size
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected&bedrooms<=10&revenue_30<3000,
+              c(revenue_30,bedrooms)), 
+       aes(x=bedrooms , y=revenue_30 , fill=as.factor(bedrooms)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("revenue over # of Rooms for ",city_sellected))+
+  xlab("# of Rooms")+ylab("revenue over 30 Days")+ labs(fill="# of Rooms")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))
+```
+### Analysis 2.7.3
+Analysis for neighborhood
+```{r}
+city_sellected <- "sevilla"
+
+ggplot(subset(cities_df,city==city_sellected&revenue_30<3000,
+              c(revenue_30,neighbourhood_cleansed)), 
+       aes(x=neighbourhood_cleansed , y=revenue_30 ,
+           fill=as.factor(neighbourhood_cleansed)))+ 
+  geom_boxplot()+
+  scale_colour_gradient()+
+  ggtitle(paste("revenue over Neighborhood for ",city_sellected))+
+  xlab("Neighborhood")+ylab("revenue over 30 Days")+ labs(fill="Neighborhood")+
+  stat_summary(fun=mean, geom="crossbar",colour="red") + 
+  stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+               aes( label=round(..y.., digits=4)))+
+  theme(legend.position="none",
+        axis.text.x=element_text(angle = -90, hjust =1,size = 5))
+```
+
