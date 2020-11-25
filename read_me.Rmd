@@ -1,0 +1,55 @@
+---
+title: "Read Me For Project"
+output: html_document
+---
+
+# Read Me
+
+This is the shiny page of the Big Data Analytics Project in ECE Paris for Kutlu Toren and Micheal Merhatam
+
+## Usage
+Please edit the city names you want to select in pre_process_data.R then run the code. Please check all_data.csv and pre_processing_data.R is available in your active working directory
+
+##Pre Processing
+The latest 3 data downloaded from the url's provided by "all_data.csv". latitude and longitude converted into numeric for leaflet use. available_30 and price converted into numeric to mutate estimated_revenue_30. All data for each city and date saved in csv file correspondingly in "/data" folder. This folder will be created if it is not exist. "cities_dates_saved.csv" created to map the available city and dates for future use
+
+## Tabs in Shiny App
+
+### Actual Page
+This is the one of 2 parent tab that holds all the functionality of shiny app
+
+#### Analysis1
+This is the tab present plots of 2 city comparison
+
+#### Analysis2 Map
+This is the tab present the leaflet map
+
+#### Analysis2 Deep
+This is the tab present plots with deeper analysis
+
+### ReadMe
+This is the one of 2 parent tab that presents read_me.Rmd
+
+
+## Functions implemented
+
+### create_leaflet(city_name,data_date) 
+returns leaflet object
+
+This function gets the name of the city and the date that listings.csv is extracted. These values should match with the available data. To secure that we are going to use "cities_dates_saved.csv" in /data folder or "cities_dates_saved" data in global environment. All data is structured in same type so this function reads them and create leaflet object to be rendered in the server
+
+```{r eval=FALSE, include=TRUE}
+
+create_leaflet(city_name ="Munich" , data_date = "2020-06-20")
+
+```
+
+### clean_listing(listings_url,calender_url,city_name,data_date) 
+returns "success" if no error. 
+This function create "/data" folder and it will be populated with listings.csv files of given url,city and date. It is used in pre-processing of the data
+
+### find_data_dates(city_name,ofset)
+returns date string
+This function gets city name, search and find corresponding date of data sets in folder. Ofset must be  in range 1,2,3. Rest function will consider it as 1
+
+
