@@ -18,23 +18,26 @@ shinyUI(fluidPage(
                                     titlePanel("Analysis1"),
                                     sidebarLayout(
                                             sidebarPanel(
-                                              selectInput("city_compare1", "Select city from list",
-                                                          choices = cities_and_dates,selected = "munich"),
-                                              radioButtons("date_a1_city1", label = ("Select The dataset from last 3 available"),
-                                                           choices = list("Most Recent" = 1, "2nd Recent" = 2, "3rd Recent" = 3), 
-                                                           selected = 1),
                                               selectInput("city_compare2", "Select city from list",
                                                           choices = cities_and_dates,selected = "amsterdam"),
                                               radioButtons("date_a1_city2", label = ("Select The dataset from last 3 available"),
+                                                           inline = TRUE,
+                                                           choices = list("Most Recent" = 1, "2nd Recent" = 2, "3rd Recent" = 3), 
+                                                           selected = 1),
+                                              selectInput("city_compare1", "Select city from list",
+                                                          choices = cities_and_dates,selected = "munich"),
+                                              radioButtons("date_a1_city1", label = ("Select The dataset from last 3 available"),
+                                                           inline = TRUE,
                                                            choices = list("Most Recent" = 1, "2nd Recent" = 2, "3rd Recent" = 3), 
                                                            selected = 1),
                                               selectInput("feature_select","Select the feature you want to cover",
                                                           choices = feature_list,selected = "price"),
-                                              radioButtons("plot_select", label = ("Select The Plot type"),
-                                                           choices = list("bar" = "bar", "hist" = "hist"), 
-                                                           selected = "bar")
                                             ),
                                             mainPanel(
+                                              radioButtons("plot_select_a1", label = ("Select The Plot type"),
+                                                           inline = TRUE,
+                                                           choices = list("box" = "box","jitter"="jitter", "hist" = "hist"), 
+                                                           selected = "box"),
                                               uiOutput("selections"),
                                               plotOutput("analysis1")
                                             )
@@ -68,11 +71,12 @@ shinyUI(fluidPage(
                                                       selected = 1),
                                          selectInput("feature_select_a2","Select the feature you want to cover",
                                                      choices = feature_list,selected = "price"),
-                                         radioButtons("plot_select_a2", label = ("Select The Plot type"),
-                                                      choices = list("bar" = "bar", "hist" = "hist"), 
-                                                      selected = "bar")
                                        ),
                                        mainPanel(
+                                         radioButtons("plot_select_a2", label = ("Select The Plot type"),
+                                                      inline = TRUE,
+                                                      choices = list("bar" = "bar", "hist" = "hist"), 
+                                                      selected = "bar"),
                                          titlePanel("test")
                                        )
                                      ))
