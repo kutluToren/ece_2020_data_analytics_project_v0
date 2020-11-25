@@ -1,9 +1,0 @@
----
-title: "Read Me For Project"
-output: html_document
----
-
-# Read Me
-
-This is the shiny page of the Big Data Analytics Project in ECE Paris
-
