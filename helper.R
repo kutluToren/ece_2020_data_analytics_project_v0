@@ -68,7 +68,7 @@ find_data_dates <- function(city_name,ofset){
 
 
 
-analysis1<-function(city_name1, city_name2, data_date1, data_date2,feature_select){
+analysis1<-function(city_name1, city_name2, data_date1, data_date2,feature_select,plot_select_a1){
   
   setwd(paste(old_dir,"data",sep = "/"))
   
@@ -78,14 +78,33 @@ analysis1<-function(city_name1, city_name2, data_date1, data_date2,feature_selec
   
   #head(cities_df)
   
-  return(  ggplot(cities_df,aes_string(x="city",y=feature_select, fill="city"))+
-          geom_jitter(alpha = 0.1, shape = 16)+
-          theme(legend.position="none")+
-           ggtitle(paste(feature_select,"over Cities (Average value in red)",sep = " " ))+
-          xlab("Name of the Cities")+ylab(paste(feature_select))+
-          stat_summary(fun=mean, geom="pointrange",colour="red") + 
-          stat_summary(fun=mean, colour="red", geom="text", 
-                  show.legend  = FALSE, vjust=-0.7, aes(label=round(..y.., digits=4))))
+  if(plot_select_a1=="box"){
+    return(
+      ggplot(cities_df,aes_string(x="city",y=feature_select, fill="city"))+
+        geom_boxplot() +
+        ggtitle("Availability over Cities (Average value in red)")+
+        xlab("Name of the Cities")+ylab(paste(feature_select))+
+        stat_summary(fun=mean, geom="crossbar",colour="red") + 
+        stat_summary(fun=mean, colour="red", geom="text", show.legend  = FALSE, vjust=-0.7,      
+                     aes( label=round(..y.., digits=4)))+
+        scale_fill_brewer(palette="BuPu")
+    )
+  }else if(plot_select_a1=="jitter"){
+    return(  
+              ggplot(cities_df,aes_string(x="city",y=feature_select, fill="city"))+
+               geom_jitter(alpha = 0.1, shape = 16)+
+               theme(legend.position="none")+
+               ggtitle(paste(feature_select,"over Cities (Average value in red)",sep = " " ))+
+               xlab("Name of the Cities")+ylab(paste(feature_select))+
+               stat_summary(fun=mean, geom="pointrange",colour="red") + 
+               stat_summary(fun=mean, colour="red", geom="text", 
+                            show.legend  = FALSE, vjust=-0.7, aes(label=round(..y.., digits=4))))
+    
+  }else{
+    
+  }
+  
+  
 }
 
 
