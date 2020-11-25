@@ -3,6 +3,7 @@ library(stringr)
 library(ggplot2)
 library(data.table)
 library(leaflet)
+library(htmltools)
 
 old_dir <- getwd()
 
@@ -14,13 +15,15 @@ create_leaflet<-function(city_name,data_date){
   #filter the necessary values
   df <- 
     subset(as.data.frame(read.csv(paste( city_name, data_date,"listings.csv",sep = "_")))
-           ,select = c("neighbourhood_cleansed"
+           ,select = c("id"
+                       ,"neighbourhood_cleansed"
                        ,"price"
                        ,"latitude"
                        ,"longitude"))
 
 
-  markers <- subset(df,select = c("latitude","longitude"))
+  markers <- subset(df,select = c("id","price","latitude","longitude"))
+  
 
   #return to old directory
   #setwd(old_dir)
@@ -28,9 +31,11 @@ create_leaflet<-function(city_name,data_date){
   
   return(
     markers%>%
-      leaflet() %>%
+      leaflet() %>% 
+      #setView(mean(markers$longitude),mean(markers$latitude),zoom = 14)%>% #Very slow to react
       addTiles()%>%
-      addMarkers(clusterOptions = markerClusterOptions()))
+      addMarkers(~longitude,~latitude,popup = ~htmlEscape(paste("ID is:", id,"Price is: $",price)),
+                 clusterOptions = markerClusterOptions()))
 }
 
 
