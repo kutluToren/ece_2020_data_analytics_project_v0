@@ -61,11 +61,31 @@ find_data_dates <- function(city_name,ofset){
   }else{
     return(lookup_city_date$data_date[1])
   }
- 
-  
 }
 
 
-##############################################
+############################################## Plotting Functions
+
+
+
+analysis1<-function(city_name1, city_name2, data_date1, data_date2){
+  
+  setwd(paste(old_dir,"data",sep = "/"))
+  
+  cities_df <- rbind(
+    as.data.frame(read.csv(paste(city_name1, find_data_dates(city_name1,data_date1),"listings.csv",sep = "_"))),
+    as.data.frame(read.csv(paste(city_name2, find_data_dates(city_name2,data_date2),"listings.csv",sep = "_"))))
+  
+  #head(cities_df)
+  
+  return(  ggplot(cities_df,aes(x=city,y=availability_30, fill=city))+
+          geom_jitter(alpha = 0.1, shape = 16)+
+          theme(legend.position="none")+
+           ggtitle("Availability over Cities (Average value in red)")+
+          xlab("Name of the Cities")+ylab("Availability over 30 Days")+
+          stat_summary(fun=mean, geom="pointrange",colour="red") + 
+          stat_summary(fun=mean, colour="red", geom="text", 
+                  show.legend  = FALSE, vjust=-0.7, aes(label=round(..y.., digits=4))))
+}
 
 
