@@ -35,7 +35,8 @@ shinyUI(fluidPage(
                                                            selected = "bar")
                                             ),
                                             mainPanel(
-                                              uiOutput("selections")
+                                              uiOutput("selections"),
+                                              plotOutput("analysis1")
                                             )
                                     )),
                             
