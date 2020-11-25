@@ -20,5 +20,13 @@ shinyServer(function(input, output) {
   # render the map by selected city and date (date recovered from database)
   output$mymap <- renderLeaflet({create_leaflet(input$city_select,
                                                 find_data_dates(input$city_select,input$date_select)) })
+  
+  #render_plot
+  output$analysis1 <- renderPlot(
+    {analysis1(input$city_compare1,
+               input$city_compare2, 
+               find_data_dates(input$city_compare1,input$date_a1_city1), 
+               find_data_dates(input$city_compare2,input$date_a1_city2) 
+    )})
 
   })
