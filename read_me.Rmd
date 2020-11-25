@@ -1,0 +1,33 @@
+---
+title: "Read Me For Project"
+output: html_document
+---
+
+# Read Me
+
+This is the shiny page of the Big Data Analytics Project in ECE Paris
+
+
+
+## Functions implemented:
+
+### create_leaflet(city_name,data_date) 
+returns leaflet object
+
+This function gets the name of the city and the date that listings.csv is extracted. These values should match with the available data. To secure that we are going to use "cities_dates_saved.csv" in /data folder or "cities_dates_saved" data in global environment. All data is structured in same type so this function reads them and create leaflet object to be rendered in the server
+
+```{r eval=FALSE, include=TRUE}
+
+create_leaflet(city_name ="Munich" , data_date = "2020-06-20")
+
+```
+
+### clean_listing(listings_url,calender_url,city_name,data_date) 
+returns "success" if no error. 
+This function create "/data" folder and it will be populated with listings.csv files of given url,city and date. It is used in pre-processing of the data
+
+### find_data_dates(city_name,ofset)
+returns date string
+This function gets city name, search and find corresponding date of data sets in folder. 
+
+
