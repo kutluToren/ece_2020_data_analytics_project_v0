@@ -3,6 +3,9 @@ library(leaflet)
 
 
 cities_and_dates <- c("munich", "madrid","amsterdam","berlin")
+feature_list <- c("id", "neighbourhood_cleansed", 
+                  "property_type", "room_type", "accommodates", "bedrooms", 
+                  "beds", "price", "availability_30", "minimum_nights",  "maximum_nights")
 
 
 shinyUI(fluidPage(
@@ -17,7 +20,9 @@ shinyUI(fluidPage(
                                               selectInput("city_compare1", "Select city from list",
                                                           choices = cities_and_dates,selected = "munich"),
                                               selectInput("city_compare2", "Select city from list",
-                                                          choices = cities_and_dates,selected = "amsterdam")
+                                                          choices = cities_and_dates,selected = "amsterdam"),
+                                              selectInput("feature_select","Select the feature you want to cover",
+                                                          choices = feature_list,selected = "price")
                                             ),
                                             mainPanel(
                                               p()
@@ -25,9 +30,9 @@ shinyUI(fluidPage(
                                     )),
                             
                             
-                            # Analysis 2
-                            tabPanel("Analysis2", 
-                                    titlePanel("Analysis2"),
+                            # Analysis 2 Map
+                            tabPanel("Analysis2_map", 
+                                    titlePanel("Analysis2 Map"),
                                     sidebarLayout(
                                       sidebarPanel(
                                         selectInput("city_select", "Select city from list",
@@ -39,8 +44,24 @@ shinyUI(fluidPage(
                                       mainPanel(
                                         leafletOutput("mymap")
                                       )
-                                    )
-                 ))
+                                    )),
+                            # Analysis 2 Deep Analysis
+                            tabPanel("Analysis2_deep", 
+                                     titlePanel("Analysis2 Deep Analysis"),
+                                     sidebarLayout(
+                                       sidebarPanel(
+                                         selectInput("city_select2", "Select city from list",
+                                                     choices = cities_and_dates,selected = "munich"),
+                                         radioButtons("date_select2", label = h3("Select The dataset from last 3 available"),
+                                                      choices = list("Most Recent" = 1, "2nd Recent" = 2, "3rd Recent" = 3), 
+                                                      selected = 1),
+                                       ),
+                                       mainPanel(
+                                         titlePanel("test")
+                                       )
+                                     ))
+
+                 )
         ),
         tabPanel("Read Me for Help", 
                  includeMarkdown("read_me.Rmd")
