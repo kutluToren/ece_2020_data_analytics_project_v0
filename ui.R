@@ -2,10 +2,10 @@ library(shiny)
 library(leaflet)
 
 
-cities_and_dates <- c("munich", "madrid","amsterdam","berlin")
+cities_and_dates <- c("munich", "madrid","amsterdam","berlin","antwerp")
 feature_list <- c("id", "neighbourhood_cleansed", 
                   "property_type", "room_type", "accommodates", "bedrooms", 
-                  "beds", "price", "availability_30", "minimum_nights",  "maximum_nights")
+                  "beds", "price", "availability_30", "minimum_nights",  "maximum_nights","estimated_revenue_30")
 plot_list <- c("bar","hist")
 
 
@@ -36,10 +36,10 @@ shinyUI(fluidPage(
                                             mainPanel(
                                               radioButtons("plot_select_a1", label = ("Select The Plot type"),
                                                            inline = TRUE,
-                                                           choices = list("box" = "box","jitter"="jitter", "hist" = "hist"), 
+                                                           choices = list("box" = "box","jitter"="jitter", "bar" = "bar"), 
                                                            selected = "box"),
                                               uiOutput("selections"),
-                                              plotOutput("analysis1")
+                                              plotOutput("analysis1",width = "100%")
                                             )
                                     )),
                             
@@ -70,14 +70,14 @@ shinyUI(fluidPage(
                                                       choices = list("Most Recent" = 1, "2nd Recent" = 2, "3rd Recent" = 3), 
                                                       selected = 1),
                                          selectInput("feature_select_a2","Select the feature you want to cover",
-                                                     choices = feature_list,selected = "price"),
+                                                     choices = list("price","room_type","bedrooms","availability_30"),selected = "price"),
                                        ),
                                        mainPanel(
-                                         radioButtons("plot_select_a2", label = ("Select The Plot type"),
-                                                      inline = TRUE,
-                                                      choices = list("bar" = "bar", "hist" = "hist"), 
-                                                      selected = "bar"),
-                                         titlePanel("test")
+                                         #radioButtons("plot_select_a2", label = ("Select The Plot type"),
+                                         #             inline = TRUE,
+                                         #             choices = list("box" = "box","jitter"="jitter", "bar" = "bar"), 
+                                         #             selected = "box"),
+                                         plotOutput("analysis2")
                                        )
                                      ))
 
