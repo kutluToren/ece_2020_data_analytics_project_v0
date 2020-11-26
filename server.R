@@ -29,7 +29,7 @@ shinyServer(function(input, output) {
                input$city_compare2, 
                find_data_dates(input$city_compare1,input$date_a1_city1), 
                find_data_dates(input$city_compare2,input$date_a1_city2),
-               input$feature_select_a2,
+               input$feature_select,
                input$plot_select_a1
     )})
   
